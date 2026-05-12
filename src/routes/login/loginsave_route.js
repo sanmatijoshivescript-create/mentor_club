@@ -2,9 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../config/db_connection');
-
+console.log("✅ loginsave route loaded");
 /** GET helps verify the URL on Render */
 router.get('/loginsave', (req, res) => {
+    console.log("🔥 loginsave API HIT");
     res.status(200).json({
         ok: true,
         hint: 'Use POST with JSON body: { "email", "password" }'
@@ -26,6 +27,7 @@ router.post('/loginsave', (req, res) => {
     db.query(sql, [email, password], (err, result) => {
         if (err) {
             console.error('loginsave DB Error:', err.code, err.message);
+            console.error("❌ FULL ERROR:", err);
 
             const dup =
                 err.code === 'ER_DUP_ENTRY' ||
