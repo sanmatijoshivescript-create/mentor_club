@@ -1,62 +1,19 @@
-// const express = require('express');
-// const router = express.Router();
-
-// const bcrypt = require('bcrypt');
-// const db = require('../../config/db_connection');
-
-// router.post('/login', async (req, res) => {
-//     const { email, password } = req.body;
-
-//     if (!email || !password) {
-//         return res.status(400).json({
-//             success: false,
-//             message: 'Email and password are required'
-//         });
-//     }
-
-//     try {
-//         const hashedPassword = await bcrypt.hash(password, 10);
-
-//         const sql = 'INSERT INTO login (email, password) VALUES (?, ?)';
-
-//         db.query(sql, [email, hashedPassword], (err, result) => {
-//             if (err) {
-//                 console.error('DB Error:', err);
-//                 return res.status(500).json({
-//                     success: false,
-//                     message: 'Insert failed'
-//                 });
-//             }
-
-//             res.json({
-//                 success: true,
-//                 message: 'User created',
-//                 insertId: result.insertId
-//             });
-//         });
-
-//     } catch (error) {
-//         console.error('Hash Error:', error);
-//         res.status(500).json({
-//             success: false,
-//             message: 'Hashing error'
-//         });
-//     }
-// });
-
-// module.exports = router;
-
-
 
 const express = require('express');
 const router = express.Router();
-
 const db = require('../../config/db_connection');
+
+/** GET helps verify the URL on Render */
+router.get('/loginsave', (req, res) => {
+    res.status(200).json({
+        ok: true,
+        hint: 'Use POST with JSON body: { "email", "password" }'
+    });
+});
 
 router.post('/loginsave', (req, res) => {
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
         return res.status(400).json({
             success: false,
@@ -68,16 +25,21 @@ router.post('/loginsave', (req, res) => {
 
     db.query(sql, [email, password], (err, result) => {
         if (err) {
-            console.error('DB Error:', err);
-            return res.status(500).json({
+            console.error('loginsave DB Error:', err.code, err.message);
+
+            const dup =
+                err.code === 'ER_DUP_ENTRY' ||
+                String(err.message || '').includes('Duplicate');
+
+            return res.status(dup ? 409 : 500).json({
                 success: false,
-                message: 'Insert failed'
+                message: dup ? 'Email already registered' : 'Insert failed'
             });
         }
 
         res.json({
             success: true,
-            message: 'User saved (plain text)',
+            message: 'User saved (plain text password)',
             insertId: result.insertId
         });
     });
