@@ -24,27 +24,54 @@ router.post('/loginsave', (req, res) => {
 
     const sql = 'INSERT INTO login (email, password) VALUES (?, ?)';
 
+    // db.query(sql, [email, password], (err, result) => {
+    //     if (err) {
+    //         console.error('loginsave DB Error:', err.code, err.message);
+    //         console.error("❌ FULL ERROR:", err);
+
+    //         const dup =
+    //             err.code === 'ER_DUP_ENTRY' ||
+    //             String(err.message || '').includes('Duplicate');
+
+    //         return res.status(dup ? 409 : 500).json({
+    //             success: false,
+    //             message: dup ? 'Email already registered' : 'Insert failed'
+                
+    //         });
+    //     }
+
+    //     res.json({
+    //         success: true,
+    //         message: 'User saved (plain text password)',
+    //         insertId: result.insertId
+    //     });
+    // });
     db.query(sql, [email, password], (err, result) => {
-        if (err) {
-            console.error('loginsave DB Error:', err.code, err.message);
-            console.error("❌ FULL ERROR:", err);
+    if (err) {
+        console.error('loginsave DB Error:', err.code, err.message);
+        console.error("❌ FULL ERROR:", err);
 
-            const dup =
-                err.code === 'ER_DUP_ENTRY' ||
-                String(err.message || '').includes('Duplicate');
+        const dup =
+            err.code === 'ER_DUP_ENTRY' ||
+            String(err.message || '').includes('Duplicate');
 
-            return res.status(dup ? 409 : 500).json({
-                success: false,
-                message: dup ? 'Email already registered' : 'Insert failed'
-            });
-        }
+        return res.status(dup ? 409 : 500).json({
+            success: false,
+            message: dup ? 'Email already registered' : 'Insert failed',
 
-        res.json({
-            success: true,
-            message: 'User saved (plain text password)',
-            insertId: result.insertId
+            // 👇 ADD THESE (IMPORTANT)
+            error_code: err.code,
+            error_message: err.message,
+            error_sql: err.sqlMessage
         });
+    }
+
+    res.json({
+        success: true,
+        message: 'User saved',
+        insertId: result.insertId
     });
+});
 });
 
 module.exports = router;
