@@ -53,7 +53,7 @@ const router = express.Router();
 
 const db = require('../../config/db_connection');
 
-router.post('/login', (req, res) => {
+router.post('/loginsave', (req, res) => {
     const { email, password } = req.body;
 
     // Validation
