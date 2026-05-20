@@ -56,11 +56,21 @@ const saveTokenRoute = require("./src/routes/save_token");
 // use route
 app.use("/api", saveTokenRoute);
 
+const supportRoutes = require("./src/routes/support_routes");
+
+app.use("/api", supportRoutes);
+const deleteAccountRoutes = require("./src/routes/delete_account");
+
+app.use("/api", deleteAccountRoutes);
+
 //module.exports = router;
 
 // Test API
 app.get('/', (req, res) => {
     res.send('API Running 🚀');
+});
+app.get("/api/support-test", (req, res) => {
+  res.send("Support route working ✅");
 });
 
 // Start server
