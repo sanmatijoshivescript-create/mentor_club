@@ -39,7 +39,8 @@ const db = require('../../config/db_connection');
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
 
-    const sql = "SELECT * FROM login WHERE email=? AND password=?";
+  //  const sql = "SELECT * FROM login WHERE email=? AND password=? ";
+     const sql = "SELECT * FROM login WHERE email = ? AND password = ? AND activation = 1";
 
     db.query(sql, [email, password], (err, result) => {
         if (err) {
